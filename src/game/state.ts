@@ -21,6 +21,12 @@ type GameState = {
   linearDamping: number
   angularDamping: number
   maxSpeed: number
+  cameraFollowSharpnessThird: number
+  cameraFollowSharpnessFirst: number
+  cameraThirdOffsetUp: number
+  cameraThirdOffsetBack: number
+  cameraFirstOffsetUp: number
+  cameraFirstOffsetForward: number
   time: number
   lastUpdated: number
 }
@@ -41,6 +47,12 @@ const state: GameState = {
   linearDamping: 0.28,
   angularDamping: 1.2,
   maxSpeed: 32,
+  cameraFollowSharpnessThird: 7,
+  cameraFollowSharpnessFirst: 10,
+  cameraThirdOffsetUp: 2.2,
+  cameraThirdOffsetBack: -6,
+  cameraFirstOffsetUp: 0.25,
+  cameraFirstOffsetForward: 0.6,
   time: 0,
   lastUpdated: 0,
 }
@@ -92,5 +104,11 @@ export function toggleCameraMode() {
 
 export function setMode(mode: GameMode) {
   state.mode = mode
+  emit()
+}
+
+export function updateTuning(updater: (draft: GameState) => void) {
+  updater(state)
+  snapshot = createSnapshot(state)
   emit()
 }

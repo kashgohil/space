@@ -13,7 +13,16 @@ export function CameraRig() {
   const rotationQuat = useMemo(() => new THREE.Quaternion(), [])
 
   useFrame((_state, delta) => {
-    const { ship, cameraMode } = getState()
+    const {
+      ship,
+      cameraMode,
+      cameraFollowSharpnessFirst,
+      cameraFollowSharpnessThird,
+      cameraThirdOffsetUp,
+      cameraThirdOffsetBack,
+      cameraFirstOffsetUp,
+      cameraFirstOffsetForward,
+    } = getState()
 
     rotationEuler.set(ship.rotation[0], ship.rotation[1], ship.rotation[2])
     rotationQuat.setFromEuler(rotationEuler)
@@ -24,22 +33,26 @@ export function CameraRig() {
     target.set(ship.position[0], ship.position[1], ship.position[2])
 
     if (cameraMode === 'first') {
+      const sharpness = Math.max(0.1, cameraFollowSharpnessFirst)
+      const t = 1 - Math.exp(-sharpness * delta)
       desiredPosition
         .copy(target)
-        .add(shipUp.clone().multiplyScalar(0.25))
-        .add(shipForward.clone().multiplyScalar(0.6))
+        .add(shipUp.clone().multiplyScalar(cameraFirstOffsetUp))
+        .add(shipForward.clone().multiplyScalar(cameraFirstOffsetForward))
 
-      camera.position.lerp(desiredPosition, 1 - Math.pow(0.001, delta))
+      camera.position.lerp(desiredPosition, t)
       camera.lookAt(target.clone().add(shipForward))
       return
     }
 
     desiredPosition
       .copy(target)
-      .add(shipUp.clone().multiplyScalar(2.2))
-      .add(shipForward.clone().multiplyScalar(-6))
+      .add(shipUp.clone().multiplyScalar(cameraThirdOffsetUp))
+      .add(shipForward.clone().multiplyScalar(cameraThirdOffsetBack))
 
-    camera.position.lerp(desiredPosition, 1 - Math.pow(0.01, delta))
+    const sharpness = Math.max(0.1, cameraFollowSharpnessThird)
+    const t = 1 - Math.exp(-sharpness * delta)
+    camera.position.lerp(desiredPosition, t)
     camera.lookAt(target)
   })
 

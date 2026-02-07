@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import './App.css'
 import { GameCanvas } from './game/GameCanvas'
 import { resetInput, setKeyState } from './game/input'
+import { TuningPanel } from './game/components/TuningPanel'
 import { toggleCameraMode } from './game/state'
 import { useGameStore } from './game/hooks/useGameStore'
 
@@ -49,6 +50,7 @@ function App() {
 
   return (
     <div className="app">
+      <TuningPanel />
       <header className="hud">
         <div className="hud__title">Project: Starforged</div>
         <div className="hud__row">
