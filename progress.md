@@ -10,3 +10,10 @@ Original prompt: setup react + threejs structure
 - Fixed useSyncExternalStore snapshot stability by caching snapshot and only recreating on state updates.
 
 - Updated layout CSS so canvas fills full viewport; HUD now overlays instead of consuming layout height.
+
+- Added input system with throttle/brake + pitch/yaw/roll controls.
+- Implemented physics-based thrust/torque, damping, and speed caps in sim.
+- Updated HUD telemetry to show speed and throttle plus control hints.
+
+- Removed Playwright dependency from app.
+- Removed Playwright install artifacts from develop-web-game skill directory.
