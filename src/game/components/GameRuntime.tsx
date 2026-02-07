@@ -37,6 +37,7 @@ export function GameRuntime() {
           angularVelocity: state.ship.angularVelocity,
           health: state.ship.health,
         },
+        throttle: state.throttle,
         time: state.time,
       })
     }

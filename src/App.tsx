@@ -1,15 +1,22 @@
 import { useEffect } from 'react'
 import './App.css'
 import { GameCanvas } from './game/GameCanvas'
+import { resetInput, setKeyState } from './game/input'
 import { toggleCameraMode } from './game/state'
 import { useGameStore } from './game/hooks/useGameStore'
 
 function App() {
   const snapshot = useGameStore()
+  const speed = Math.hypot(
+    snapshot.ship.velocity[0],
+    snapshot.ship.velocity[1],
+    snapshot.ship.velocity[2],
+  )
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) return
+      setKeyState(event.code, true)
 
       if (event.key.toLowerCase() === 'c') {
         toggleCameraMode()
@@ -24,8 +31,20 @@ function App() {
       }
     }
 
+    const onKeyUp = (event: KeyboardEvent) => {
+      setKeyState(event.code, false)
+    }
+
+    const onBlur = () => resetInput()
+
     window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+    window.addEventListener('blur', onBlur)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('blur', onBlur)
+    }
   }, [])
 
   return (
@@ -36,9 +55,16 @@ function App() {
           <span>Mode: {snapshot.mode}</span>
           <span>Camera: {snapshot.cameraMode}</span>
           <span>Ship Integrity: {snapshot.ship.health}%</span>
+          <span>Speed: {speed.toFixed(1)} m/s</span>
+          <span>Throttle: {(snapshot.throttle * 100).toFixed(0)}%</span>
         </div>
         <div className="hud__row hud__row--muted">
-          <span>`C` toggle camera</span>
+          <span>`W/S` pitch</span>
+          <span>`A/D` yaw</span>
+          <span>`Q/E` roll</span>
+          <span>`Shift/Ctrl` throttle</span>
+          <span>`Space` brake</span>
+          <span>`C` camera</span>
           <span>`F` fullscreen</span>
         </div>
       </header>

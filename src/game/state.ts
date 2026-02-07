@@ -14,7 +14,13 @@ type ShipState = {
 type GameState = {
   mode: GameMode
   cameraMode: CameraMode
+  throttle: number
   ship: ShipState
+  maxThrust: number
+  maxAngularAccel: number
+  linearDamping: number
+  angularDamping: number
+  maxSpeed: number
   time: number
   lastUpdated: number
 }
@@ -22,6 +28,7 @@ type GameState = {
 const state: GameState = {
   mode: 'space',
   cameraMode: 'third',
+  throttle: 0.15,
   ship: {
     position: [0, 0, 0],
     rotation: [0, 0, 0],
@@ -29,6 +36,11 @@ const state: GameState = {
     angularVelocity: [0, 0, 0],
     health: 100,
   },
+  maxThrust: 18,
+  maxAngularAccel: 2.4,
+  linearDamping: 0.28,
+  angularDamping: 1.2,
+  maxSpeed: 32,
   time: 0,
   lastUpdated: 0,
 }
