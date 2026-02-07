@@ -17,3 +17,5 @@ Original prompt: setup react + threejs structure
 
 - Removed Playwright dependency from app.
 - Removed Playwright install artifacts from develop-web-game skill directory.
+
+- Added Leva tuning panel to expose core physics and camera smoothing/offsets.
