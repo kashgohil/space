@@ -19,3 +19,7 @@ Original prompt: setup react + threejs structure
 - Removed Playwright install artifacts from develop-web-game skill directory.
 
 - Added Leva tuning panel to expose core physics and camera smoothing/offsets.
+
+- Added floating-origin support with world position + offset.
+- Added procedural sector generation for asteroids.
+- Disabled linear damping by default and allow unlimited speed.
