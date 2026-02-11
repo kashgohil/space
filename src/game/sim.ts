@@ -32,12 +32,14 @@ export function simulate(dt: number) {
       ship.velocity[2] -= ship.velocity[2] * brakeStrength
     }
 
-    const speed = Math.hypot(ship.velocity[0], ship.velocity[1], ship.velocity[2])
-    if (speed > draft.maxSpeed) {
-      const scale = draft.maxSpeed / speed
-      ship.velocity[0] *= scale
-      ship.velocity[1] *= scale
-      ship.velocity[2] *= scale
+    if (draft.maxSpeed > 0) {
+      const speed = Math.hypot(ship.velocity[0], ship.velocity[1], ship.velocity[2])
+      if (speed > draft.maxSpeed) {
+        const scale = draft.maxSpeed / speed
+        ship.velocity[0] *= scale
+        ship.velocity[1] *= scale
+        ship.velocity[2] *= scale
+      }
     }
 
     const angularAccel = draft.maxAngularAccel
@@ -49,14 +51,31 @@ export function simulate(dt: number) {
     ship.rotation[0] += ship.angularVelocity[0] * dt
     ship.rotation[2] += ship.angularVelocity[2] * dt
 
-    ship.position[0] += ship.velocity[0] * dt
-    ship.position[1] += ship.velocity[1] * dt
-    ship.position[2] += ship.velocity[2] * dt
+    ship.worldPosition[0] += ship.velocity[0] * dt
+    ship.worldPosition[1] += ship.velocity[1] * dt
+    ship.worldPosition[2] += ship.velocity[2] * dt
 
-    const linearDamping = Math.exp(-draft.linearDamping * dt)
-    ship.velocity[0] *= linearDamping
-    ship.velocity[1] *= linearDamping
-    ship.velocity[2] *= linearDamping
+    ship.position[0] = ship.worldPosition[0] - draft.worldOffset[0]
+    ship.position[1] = ship.worldPosition[1] - draft.worldOffset[1]
+    ship.position[2] = ship.worldPosition[2] - draft.worldOffset[2]
+
+    const localDistance = Math.hypot(ship.position[0], ship.position[1], ship.position[2])
+    if (localDistance > draft.floatingOriginThreshold) {
+      draft.worldOffset[0] += ship.position[0]
+      draft.worldOffset[1] += ship.position[1]
+      draft.worldOffset[2] += ship.position[2]
+
+      ship.position[0] = 0
+      ship.position[1] = 0
+      ship.position[2] = 0
+    }
+
+    if (draft.linearDamping > 0) {
+      const linearDamping = Math.exp(-draft.linearDamping * dt)
+      ship.velocity[0] *= linearDamping
+      ship.velocity[1] *= linearDamping
+      ship.velocity[2] *= linearDamping
+    }
 
     const angularDamping = Math.exp(-draft.angularDamping * dt)
     ship.angularVelocity[0] *= angularDamping

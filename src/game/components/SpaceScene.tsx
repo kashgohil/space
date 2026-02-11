@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import * as THREE from 'three'
 import { getState } from '../state'
+import { ProceduralField } from './ProceduralField'
 import { Ship } from './Ship'
 
 function ShipActor() {
@@ -30,6 +31,7 @@ export function SpaceScene() {
       <ambientLight intensity={0.35} />
       <directionalLight position={[8, 12, 6]} intensity={1.2} castShadow />
       <pointLight position={[-6, -4, -6]} intensity={0.6} color="#5f86ff" />
+      <ProceduralField />
       <ShipActor />
     </group>
   )

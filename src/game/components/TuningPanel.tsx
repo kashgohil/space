@@ -39,10 +39,10 @@ export function TuningPanel() {
     },
     maxSpeed: {
       value: state.maxSpeed,
-      min: 5,
-      max: 100,
+      min: 0,
+      max: 200,
       step: 1,
-      label: 'Max Speed',
+      label: 'Max Speed (0 = inf)',
       onChange: (value: number) => updateTuning((draft) => (draft.maxSpeed = value)),
     },
   }))

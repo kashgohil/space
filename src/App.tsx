@@ -13,6 +13,16 @@ function App() {
     snapshot.ship.velocity[1],
     snapshot.ship.velocity[2],
   )
+  const distance = Math.hypot(
+    snapshot.ship.worldPosition[0],
+    snapshot.ship.worldPosition[1],
+    snapshot.ship.worldPosition[2],
+  )
+  const sector = [
+    Math.floor(snapshot.ship.worldPosition[0] / snapshot.sectorSize),
+    Math.floor(snapshot.ship.worldPosition[1] / snapshot.sectorSize),
+    Math.floor(snapshot.ship.worldPosition[2] / snapshot.sectorSize),
+  ]
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -59,6 +69,10 @@ function App() {
           <span>Ship Integrity: {snapshot.ship.health}%</span>
           <span>Speed: {speed.toFixed(1)} m/s</span>
           <span>Throttle: {(snapshot.throttle * 100).toFixed(0)}%</span>
+          <span>Distance: {distance.toFixed(0)} m</span>
+          <span>
+            Sector: {sector[0]}, {sector[1]}, {sector[2]}
+          </span>
         </div>
         <div className="hud__row hud__row--muted">
           <span>`W/S` pitch</span>

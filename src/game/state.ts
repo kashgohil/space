@@ -5,6 +5,7 @@ type Vec3 = [number, number, number]
 
 type ShipState = {
   position: Vec3
+  worldPosition: Vec3
   rotation: Vec3
   velocity: Vec3
   angularVelocity: Vec3
@@ -21,6 +22,10 @@ type GameState = {
   linearDamping: number
   angularDamping: number
   maxSpeed: number
+  sectorSize: number
+  sectorRadius: number
+  worldOffset: Vec3
+  floatingOriginThreshold: number
   cameraFollowSharpnessThird: number
   cameraFollowSharpnessFirst: number
   cameraThirdOffsetUp: number
@@ -37,6 +42,7 @@ const state: GameState = {
   throttle: 0.15,
   ship: {
     position: [0, 0, 0],
+    worldPosition: [0, 0, 0],
     rotation: [0, 0, 0],
     velocity: [0, 0, 0],
     angularVelocity: [0, 0, 0],
@@ -44,9 +50,13 @@ const state: GameState = {
   },
   maxThrust: 18,
   maxAngularAccel: 2.4,
-  linearDamping: 0.28,
+  linearDamping: 0,
   angularDamping: 1.2,
-  maxSpeed: 32,
+  maxSpeed: 0,
+  sectorSize: 800,
+  sectorRadius: 1,
+  worldOffset: [0, 0, 0],
+  floatingOriginThreshold: 2000,
   cameraFollowSharpnessThird: 7,
   cameraFollowSharpnessFirst: 10,
   cameraThirdOffsetUp: 2.2,
@@ -65,10 +75,12 @@ function createSnapshot(source: GameState) {
     ship: {
       ...source.ship,
       position: [...source.ship.position] as Vec3,
+      worldPosition: [...source.ship.worldPosition] as Vec3,
       rotation: [...source.ship.rotation] as Vec3,
       velocity: [...source.ship.velocity] as Vec3,
       angularVelocity: [...source.ship.angularVelocity] as Vec3,
     },
+    worldOffset: [...source.worldOffset] as Vec3,
   }
 }
 

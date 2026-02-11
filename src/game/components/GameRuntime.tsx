@@ -32,12 +32,15 @@ export function GameRuntime() {
         cameraMode: state.cameraMode,
         ship: {
           position: state.ship.position,
+          worldPosition: state.ship.worldPosition,
           rotation: state.ship.rotation,
           velocity: state.ship.velocity,
           angularVelocity: state.ship.angularVelocity,
           health: state.ship.health,
         },
         throttle: state.throttle,
+        worldOffset: state.worldOffset,
+        sectorSize: state.sectorSize,
         time: state.time,
       })
     }
