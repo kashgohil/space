@@ -23,3 +23,5 @@ Original prompt: setup react + threejs structure
 - Added floating-origin support with world position + offset.
 - Added procedural sector generation for asteroids.
 - Disabled linear damping by default and allow unlimited speed.
+
+- Added procedural POIs (planets/stations/derelicts) and nearest-POI HUD marker.
