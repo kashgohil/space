@@ -1,10 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import './App.css'
 import { GameCanvas } from './game/GameCanvas'
 import { resetInput, setKeyState } from './game/input'
+import { useMemo } from 'react'
 import { TuningPanel } from './game/components/TuningPanel'
 import { toggleCameraMode } from './game/state'
 import { useGameStore } from './game/hooks/useGameStore'
+import { getNearbyPOIs } from './game/procedural'
 
 function App() {
   const snapshot = useGameStore()
@@ -23,6 +25,21 @@ function App() {
     Math.floor(snapshot.ship.worldPosition[1] / snapshot.sectorSize),
     Math.floor(snapshot.ship.worldPosition[2] / snapshot.sectorSize),
   ]
+
+  const nearestPoi = useMemo(() => {
+    const pois = getNearbyPOIs(snapshot.ship.worldPosition, snapshot.sectorSize, snapshot.sectorRadius)
+    if (!pois.length) return null
+
+    let best = null as null | { kind: string; distance: number }
+    for (const poi of pois) {
+      const dx = poi.position[0] - snapshot.ship.worldPosition[0]
+      const dy = poi.position[1] - snapshot.ship.worldPosition[1]
+      const dz = poi.position[2] - snapshot.ship.worldPosition[2]
+      const d = Math.hypot(dx, dy, dz)
+      if (!best || d < best.distance) best = { kind: poi.kind, distance: d }
+    }
+    return best
+  }, [snapshot.ship.worldPosition, snapshot.sectorRadius, snapshot.sectorSize])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -72,6 +89,10 @@ function App() {
           <span>Distance: {distance.toFixed(0)} m</span>
           <span>
             Sector: {sector[0]}, {sector[1]}, {sector[2]}
+          </span>
+          <span>
+            Nearest POI:{' '}
+            {nearestPoi ? `${nearestPoi.kind} (${nearestPoi.distance.toFixed(0)} m)` : 'none'}
           </span>
         </div>
         <div className="hud__row hud__row--muted">

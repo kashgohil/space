@@ -7,9 +7,17 @@ export type Asteroid = {
   scale: number
 }
 
+export type POI = {
+  id: string
+  kind: 'planet' | 'station' | 'derelict'
+  position: Vec3
+  radius: number
+}
+
 export type SectorData = {
   key: SectorKey
   asteroids: Asteroid[]
+  pois: POI[]
 }
 
 const sectorCache = new Map<SectorKey, SectorData>()
@@ -59,13 +67,43 @@ function generateSectorAsteroids(sectorX: number, sectorY: number, sectorZ: numb
   return asteroids
 }
 
+function generateSectorPOIs(sectorX: number, sectorY: number, sectorZ: number, sectorSize: number) {
+  const seed = hashString(`poi:${sectorX},${sectorY},${sectorZ}`)
+  const rand = mulberry32(seed)
+
+  const poiChance = 0.08
+  if (rand() > poiChance) return [] as POI[]
+
+  const roll = rand()
+  let kind: POI['kind'] = 'derelict'
+  if (roll > 0.66) kind = 'planet'
+  else if (roll > 0.33) kind = 'station'
+
+  const base = sectorSize * 0.2
+  const radius = kind === 'planet' ? base * (0.8 + rand() * 1.8) : base * (0.35 + rand() * 0.5)
+
+  const px = (sectorX + 0.5 + (rand() - 0.5) * 0.4) * sectorSize
+  const py = (sectorY + 0.5 + (rand() - 0.5) * 0.4) * sectorSize
+  const pz = (sectorZ + 0.5 + (rand() - 0.5) * 0.4) * sectorSize
+
+  return [
+    {
+      id: `poi:${sectorX}:${sectorY}:${sectorZ}`,
+      kind,
+      position: [px, py, pz],
+      radius,
+    },
+  ]
+}
+
 export function getSectorData(sectorX: number, sectorY: number, sectorZ: number, sectorSize: number) {
   const key = makeSectorKey(sectorX, sectorY, sectorZ)
   const cached = sectorCache.get(key)
   if (cached) return cached
 
   const asteroids = generateSectorAsteroids(sectorX, sectorY, sectorZ, sectorSize)
-  const data = { key, asteroids }
+  const pois = generateSectorPOIs(sectorX, sectorY, sectorZ, sectorSize)
+  const data = { key, asteroids, pois }
   sectorCache.set(key, data)
   return data
 }
@@ -90,4 +128,8 @@ export function getNearbySectors(
   }
 
   return sectors
+}
+
+export function getNearbyPOIs(worldPosition: Vec3, sectorSize: number, radius: number) {
+  return getNearbySectors(worldPosition, sectorSize, radius).flatMap((sector) => sector.pois)
 }

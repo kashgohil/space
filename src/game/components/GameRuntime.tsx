@@ -41,6 +41,7 @@ export function GameRuntime() {
         throttle: state.throttle,
         worldOffset: state.worldOffset,
         sectorSize: state.sectorSize,
+        sectorRadius: state.sectorRadius,
         time: state.time,
       })
     }
