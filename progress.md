@@ -30,3 +30,6 @@ Original prompt: setup react + threejs structure
 
 - Added inventory + hangar UI for equipping parts.
 - Parts now modify ship stats via applyEquippedParts.
+
+- Added save/load persistence for inventory + equipped parts.
+- Added derived stats helper and stats section in hangar.
