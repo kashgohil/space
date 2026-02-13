@@ -1,3 +1,4 @@
+import { deriveStats } from '../deriveStats'
 import { equipPart, unequipPart } from '../state'
 import { useGameStore } from '../hooks/useGameStore'
 import { getPartById } from '../parts'
@@ -6,6 +7,8 @@ export function HangarPanel() {
   const snapshot = useGameStore()
 
   if (snapshot.mode !== 'hangar') return null
+
+  const stats = deriveStats(snapshot.equippedParts)
 
   return (
     <section className="hangar">
@@ -51,6 +54,21 @@ export function HangarPanel() {
             )
           })
         )}
+      </div>
+      <div className="hangar__section">
+        <div className="hangar__label">Stats</div>
+        <div className="hangar__muted">
+          Thrust: {stats.base.maxThrust} + {stats.bonus.maxThrust}
+        </div>
+        <div className="hangar__muted">
+          Angular: {stats.base.maxAngularAccel} + {stats.bonus.maxAngularAccel}
+        </div>
+        <div className="hangar__muted">
+          Damping: {stats.base.linearDamping} + {stats.bonus.linearDamping}
+        </div>
+        <div className="hangar__muted">
+          Max Speed: {stats.base.maxSpeed} + {stats.bonus.maxSpeed}
+        </div>
       </div>
     </section>
   )

@@ -173,6 +173,7 @@ export function collectLoot() {
   state.lootCollected = true
   const partId = pickRandomPart()
   state.inventory.push(partId)
+  applyEquippedParts()
   snapshot = createSnapshot(state)
   emit()
 }

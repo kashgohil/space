@@ -8,6 +8,7 @@ import { HangarPanel } from './game/components/HangarPanel'
 import { collectLoot, landOnPlanet, setMode, takeOff, toggleCameraMode } from './game/state'
 import { useGameStore } from './game/hooks/useGameStore'
 import { getNearbyPOIs } from './game/procedural'
+import { loadSave, persistSave } from './game/persistence'
 
 function App() {
   const snapshot = useGameStore()
@@ -51,6 +52,7 @@ function App() {
   const canCollectLoot = snapshot.mode === 'planet' && !snapshot.lootCollected && lootDistance < LOOT_RADIUS
 
   useEffect(() => {
+    loadSave()
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) return
       setKeyState(event.code, true)
@@ -99,6 +101,10 @@ function App() {
       window.removeEventListener('blur', onBlur)
     }
   }, [])
+
+  useEffect(() => {
+    persistSave()
+  }, [snapshot.inventory, snapshot.equippedParts])
 
   return (
     <div className="app">
