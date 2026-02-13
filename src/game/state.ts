@@ -1,3 +1,5 @@
+import { applyEquippedParts } from './applyParts'
+
 export type CameraMode = 'first' | 'third'
 export type GameMode = 'space' | 'planet' | 'hangar'
 
@@ -25,6 +27,8 @@ type GameState = {
   lander: LanderState
   activePlanetId: string | null
   lootCollected: boolean
+  inventory: string[]
+  equippedParts: string[]
   maxThrust: number
   maxAngularAccel: number
   linearDamping: number
@@ -62,6 +66,8 @@ const state: GameState = {
   },
   activePlanetId: null,
   lootCollected: false,
+  inventory: [],
+  equippedParts: [],
   maxThrust: 18,
   maxAngularAccel: 2.4,
   linearDamping: 0,
@@ -98,6 +104,8 @@ function createSnapshot(source: GameState) {
       position: [...source.lander.position] as Vec3,
       velocity: [...source.lander.velocity] as Vec3,
     },
+    inventory: [...source.inventory],
+    equippedParts: [...source.equippedParts],
     worldOffset: [...source.worldOffset] as Vec3,
   }
 }
@@ -163,6 +171,30 @@ export function takeOff() {
 export function collectLoot() {
   if (state.lootCollected) return
   state.lootCollected = true
+  const partId = pickRandomPart()
+  state.inventory.push(partId)
   snapshot = createSnapshot(state)
   emit()
+}
+
+export function equipPart(partId: string) {
+  if (!state.inventory.includes(partId)) return
+  if (state.equippedParts.includes(partId)) return
+  state.equippedParts.push(partId)
+  applyEquippedParts()
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+export function unequipPart(partId: string) {
+  state.equippedParts = state.equippedParts.filter((id) => id !== partId)
+  applyEquippedParts()
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+function pickRandomPart() {
+  const parts = ['thruster-mk1', 'thruster-mk2', 'gyro-core', 'shield-array', 'plasma-nozzle'] as const
+  const index = Math.floor(Math.random() * parts.length)
+  return parts[index]
 }

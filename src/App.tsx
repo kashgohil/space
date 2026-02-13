@@ -4,7 +4,8 @@ import { GameCanvas } from './game/GameCanvas'
 import { resetInput, setKeyState } from './game/input'
 import { TuningPanel } from './game/components/TuningPanel'
 import { LOOT_POSITION, LOOT_RADIUS } from './game/planet'
-import { collectLoot, landOnPlanet, takeOff, toggleCameraMode } from './game/state'
+import { HangarPanel } from './game/components/HangarPanel'
+import { collectLoot, landOnPlanet, setMode, takeOff, toggleCameraMode } from './game/state'
 import { useGameStore } from './game/hooks/useGameStore'
 import { getNearbyPOIs } from './game/procedural'
 
@@ -77,6 +78,10 @@ function App() {
       if (event.code === 'KeyE' && canCollectLoot) {
         collectLoot()
       }
+
+      if (event.code === 'KeyH') {
+        setMode(snapshot.mode === 'hangar' ? 'space' : 'hangar')
+      }
     }
 
     const onKeyUp = (event: KeyboardEvent) => {
@@ -126,6 +131,7 @@ function App() {
           {snapshot.mode === 'space' ? <span>`L` land</span> : <span>`L` take off</span>}
           {snapshot.mode === 'planet' ? <span>`WASD` move</span> : null}
           {canCollectLoot ? <span>`E` collect part</span> : null}
+          <span>`H` hangar</span>
           {canLand ? <span>Landing window</span> : null}
           {snapshot.mode === 'planet' && snapshot.lootCollected ? (
             <span>Part acquired</span>
@@ -135,6 +141,7 @@ function App() {
       <main className="viewport">
         <GameCanvas />
       </main>
+      <HangarPanel />
     </div>
   )
 }
