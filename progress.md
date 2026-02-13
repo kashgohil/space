@@ -25,3 +25,5 @@ Original prompt: setup react + threejs structure
 - Disabled linear damping by default and allow unlimited speed.
 
 - Added procedural POIs (planets/stations/derelicts) and nearest-POI HUD marker.
+
+- Added landing prototype with planet scene, lander movement, and loot pickup.
