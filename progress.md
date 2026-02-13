@@ -27,3 +27,6 @@ Original prompt: setup react + threejs structure
 - Added procedural POIs (planets/stations/derelicts) and nearest-POI HUD marker.
 
 - Added landing prototype with planet scene, lander movement, and loot pickup.
+
+- Added inventory + hangar UI for equipping parts.
+- Parts now modify ship stats via applyEquippedParts.
