@@ -1,6 +1,7 @@
 import * as THREE from 'three'
-import { getInputAxis } from './input'
+import { getInputAxis, getPlanetInput } from './input'
 import { getState, setState } from './state'
+import { LANDER_SPEED } from './planet'
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value))
@@ -9,6 +10,22 @@ export function simulate(dt: number) {
   const state = getState()
 
   setState((draft) => {
+    if (draft.mode === 'planet') {
+      const input = getPlanetInput()
+      const lander = draft.lander
+      const speed = LANDER_SPEED * (input.sprint ? 1.5 : 1)
+
+      lander.velocity[0] = input.strafe * speed
+      lander.velocity[2] = input.forward * speed
+
+      lander.position[0] += lander.velocity[0] * dt
+      lander.position[2] += lander.velocity[2] * dt
+
+      draft.time += dt
+      draft.lastUpdated = state.time + dt
+      return
+    }
+
     const input = getInputAxis(dt)
     draft.time += dt
 

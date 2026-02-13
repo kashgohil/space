@@ -38,10 +38,15 @@ export function GameRuntime() {
           angularVelocity: state.ship.angularVelocity,
           health: state.ship.health,
         },
+        lander: {
+          position: state.lander.position,
+          velocity: state.lander.velocity,
+        },
         throttle: state.throttle,
         worldOffset: state.worldOffset,
         sectorSize: state.sectorSize,
         sectorRadius: state.sectorRadius,
+        lootCollected: state.lootCollected,
         time: state.time,
       })
     }

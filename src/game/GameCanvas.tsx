@@ -1,9 +1,13 @@
 import { Canvas } from '@react-three/fiber'
 import { CameraRig } from './components/CameraRig'
 import { GameRuntime } from './components/GameRuntime'
+import { PlanetScene } from './components/PlanetScene'
 import { SpaceScene } from './components/SpaceScene'
+import { useGameStore } from './hooks/useGameStore'
 
 export function GameCanvas() {
+  const snapshot = useGameStore()
+
   return (
     <Canvas
       shadows
@@ -12,8 +16,8 @@ export function GameCanvas() {
     >
       <color attach="background" args={['#05070f']} />
       <fog attach="fog" args={['#05070f', 40, 250]} />
-      <SpaceScene />
-      <CameraRig />
+      {snapshot.mode === 'space' ? <SpaceScene /> : <PlanetScene />}
+      {snapshot.mode === 'space' ? <CameraRig /> : null}
       <GameRuntime />
     </Canvas>
   )

@@ -36,6 +36,14 @@ export function getInputAxis(dt: number): InputAxis {
   return { pitch, yaw, roll, throttle, brake }
 }
 
+export function getPlanetInput() {
+  const forward = (pressedKeys.has('KeyW') ? 1 : 0) + (pressedKeys.has('KeyS') ? -1 : 0)
+  const strafe = (pressedKeys.has('KeyD') ? 1 : 0) + (pressedKeys.has('KeyA') ? -1 : 0)
+  const sprint = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight')
+
+  return { forward, strafe, sprint }
+}
+
 export function resetInput() {
   pressedKeys.clear()
   throttle = 0.15

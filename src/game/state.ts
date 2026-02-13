@@ -12,11 +12,19 @@ type ShipState = {
   health: number
 }
 
+type LanderState = {
+  position: Vec3
+  velocity: Vec3
+}
+
 type GameState = {
   mode: GameMode
   cameraMode: CameraMode
   throttle: number
   ship: ShipState
+  lander: LanderState
+  activePlanetId: string | null
+  lootCollected: boolean
   maxThrust: number
   maxAngularAccel: number
   linearDamping: number
@@ -48,6 +56,12 @@ const state: GameState = {
     angularVelocity: [0, 0, 0],
     health: 100,
   },
+  lander: {
+    position: [0, 0, 6],
+    velocity: [0, 0, 0],
+  },
+  activePlanetId: null,
+  lootCollected: false,
   maxThrust: 18,
   maxAngularAccel: 2.4,
   linearDamping: 0,
@@ -79,6 +93,10 @@ function createSnapshot(source: GameState) {
       rotation: [...source.ship.rotation] as Vec3,
       velocity: [...source.ship.velocity] as Vec3,
       angularVelocity: [...source.ship.angularVelocity] as Vec3,
+    },
+    lander: {
+      position: [...source.lander.position] as Vec3,
+      velocity: [...source.lander.velocity] as Vec3,
     },
     worldOffset: [...source.worldOffset] as Vec3,
   }
@@ -121,6 +139,30 @@ export function setMode(mode: GameMode) {
 
 export function updateTuning(updater: (draft: GameState) => void) {
   updater(state)
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+export function landOnPlanet(planetId: string) {
+  state.mode = 'planet'
+  state.activePlanetId = planetId
+  state.lander.position = [0, 0, 6]
+  state.lander.velocity = [0, 0, 0]
+  state.lootCollected = false
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+export function takeOff() {
+  state.mode = 'space'
+  state.activePlanetId = null
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+export function collectLoot() {
+  if (state.lootCollected) return
+  state.lootCollected = true
   snapshot = createSnapshot(state)
   emit()
 }

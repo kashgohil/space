@@ -2,9 +2,9 @@ import { useEffect, useMemo } from 'react'
 import './App.css'
 import { GameCanvas } from './game/GameCanvas'
 import { resetInput, setKeyState } from './game/input'
-import { useMemo } from 'react'
 import { TuningPanel } from './game/components/TuningPanel'
-import { toggleCameraMode } from './game/state'
+import { LOOT_POSITION, LOOT_RADIUS } from './game/planet'
+import { collectLoot, landOnPlanet, takeOff, toggleCameraMode } from './game/state'
 import { useGameStore } from './game/hooks/useGameStore'
 import { getNearbyPOIs } from './game/procedural'
 
@@ -41,6 +41,14 @@ function App() {
     return best
   }, [snapshot.ship.worldPosition, snapshot.sectorRadius, snapshot.sectorSize])
 
+  const canLand = nearestPoi && nearestPoi.kind === 'planet' && nearestPoi.distance < 140
+  const lootDistance = Math.hypot(
+    snapshot.lander.position[0] - LOOT_POSITION[0],
+    snapshot.lander.position[1] - LOOT_POSITION[1],
+    snapshot.lander.position[2] - LOOT_POSITION[2],
+  )
+  const canCollectLoot = snapshot.mode === 'planet' && !snapshot.lootCollected && lootDistance < LOOT_RADIUS
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) return
@@ -56,6 +64,18 @@ function App() {
         } else {
           document.exitFullscreen().catch(() => {})
         }
+      }
+
+      if (event.code === 'KeyL') {
+        if (snapshot.mode === 'space' && canLand) {
+          landOnPlanet('planet')
+        } else if (snapshot.mode === 'planet') {
+          takeOff()
+        }
+      }
+
+      if (event.code === 'KeyE' && canCollectLoot) {
+        collectLoot()
       }
     }
 
@@ -103,6 +123,13 @@ function App() {
           <span>`Space` brake</span>
           <span>`C` camera</span>
           <span>`F` fullscreen</span>
+          {snapshot.mode === 'space' ? <span>`L` land</span> : <span>`L` take off</span>}
+          {snapshot.mode === 'planet' ? <span>`WASD` move</span> : null}
+          {canCollectLoot ? <span>`E` collect part</span> : null}
+          {canLand ? <span>Landing window</span> : null}
+          {snapshot.mode === 'planet' && snapshot.lootCollected ? (
+            <span>Part acquired</span>
+          ) : null}
         </div>
       </header>
       <main className="viewport">
