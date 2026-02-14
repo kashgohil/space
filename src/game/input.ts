@@ -44,6 +44,10 @@ export function getPlanetInput() {
   return { forward, strafe, sprint }
 }
 
+export function isKeyDown(code: string) {
+  return pressedKeys.has(code)
+}
+
 export function resetInput() {
   pressedKeys.clear()
   throttle = 0.15

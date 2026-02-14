@@ -12,11 +12,28 @@ type ShipState = {
   velocity: Vec3
   angularVelocity: Vec3
   health: number
+  socketHealth: Record<'engine' | 'core' | 'leftWing' | 'rightWing', number>
 }
 
 type LanderState = {
   position: Vec3
   velocity: Vec3
+}
+
+type EnemyState = {
+  id: string
+  worldPosition: Vec3
+  velocity: Vec3
+  health: number
+  fireCooldown: number
+}
+
+type ProjectileState = {
+  id: string
+  owner: 'player' | 'enemy'
+  worldPosition: Vec3
+  velocity: Vec3
+  ttl: number
 }
 
 type GameState = {
@@ -29,6 +46,9 @@ type GameState = {
   lootCollected: boolean
   inventory: string[]
   equippedParts: string[]
+  enemies: EnemyState[]
+  projectiles: ProjectileState[]
+  playerFireCooldown: number
   maxThrust: number
   maxAngularAccel: number
   linearDamping: number
@@ -59,6 +79,12 @@ const state: GameState = {
     velocity: [0, 0, 0],
     angularVelocity: [0, 0, 0],
     health: 100,
+    socketHealth: {
+      engine: 100,
+      core: 100,
+      leftWing: 100,
+      rightWing: 100,
+    },
   },
   lander: {
     position: [0, 0, 6],
@@ -68,6 +94,17 @@ const state: GameState = {
   lootCollected: false,
   inventory: [],
   equippedParts: [],
+  enemies: [
+    {
+      id: 'drone-1',
+      worldPosition: [0, 0, 140],
+      velocity: [0, 0, -4],
+      health: 100,
+      fireCooldown: 0,
+    },
+  ],
+  projectiles: [],
+  playerFireCooldown: 0,
   maxThrust: 18,
   maxAngularAccel: 2.4,
   linearDamping: 0,
@@ -99,6 +136,7 @@ function createSnapshot(source: GameState) {
       rotation: [...source.ship.rotation] as Vec3,
       velocity: [...source.ship.velocity] as Vec3,
       angularVelocity: [...source.ship.angularVelocity] as Vec3,
+      socketHealth: { ...source.ship.socketHealth },
     },
     lander: {
       position: [...source.lander.position] as Vec3,
@@ -106,6 +144,16 @@ function createSnapshot(source: GameState) {
     },
     inventory: [...source.inventory],
     equippedParts: [...source.equippedParts],
+    enemies: source.enemies.map((enemy) => ({
+      ...enemy,
+      worldPosition: [...enemy.worldPosition] as Vec3,
+      velocity: [...enemy.velocity] as Vec3,
+    })),
+    projectiles: source.projectiles.map((projectile) => ({
+      ...projectile,
+      worldPosition: [...projectile.worldPosition] as Vec3,
+      velocity: [...projectile.velocity] as Vec3,
+    })),
     worldOffset: [...source.worldOffset] as Vec3,
   }
 }
@@ -174,6 +222,41 @@ export function collectLoot() {
   const partId = pickRandomPart()
   state.inventory.push(partId)
   applyEquippedParts()
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+export function applyDamage(socket: keyof ShipState['socketHealth'], amount: number) {
+  const ship = state.ship
+  ship.socketHealth[socket] = Math.max(0, ship.socketHealth[socket] - amount)
+  ship.health = Math.max(0, ship.health - amount * 0.6)
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+export function repairAll() {
+  const ship = state.ship
+  ship.health = 100
+  ship.socketHealth.engine = 100
+  ship.socketHealth.core = 100
+  ship.socketHealth.leftWing = 100
+  ship.socketHealth.rightWing = 100
+  snapshot = createSnapshot(state)
+  emit()
+}
+
+export function resetCombat() {
+  state.enemies = [
+    {
+      id: `drone-${Date.now()}`,
+      worldPosition: [state.ship.worldPosition[0], state.ship.worldPosition[1], state.ship.worldPosition[2] + 180],
+      velocity: [0, 0, -4],
+      health: 100,
+      fireCooldown: 0,
+    },
+  ]
+  state.projectiles = []
+  state.playerFireCooldown = 0
   snapshot = createSnapshot(state)
   emit()
 }

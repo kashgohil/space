@@ -42,6 +42,16 @@ export function GameRuntime() {
           position: state.lander.position,
           velocity: state.lander.velocity,
         },
+        enemies: state.enemies.map((enemy) => ({
+          id: enemy.id,
+          worldPosition: enemy.worldPosition,
+          health: enemy.health,
+        })),
+        projectiles: state.projectiles.map((projectile) => ({
+          id: projectile.id,
+          owner: projectile.owner,
+          worldPosition: projectile.worldPosition,
+        })),
         throttle: state.throttle,
         worldOffset: state.worldOffset,
         sectorSize: state.sectorSize,

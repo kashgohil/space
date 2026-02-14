@@ -5,7 +5,16 @@ import { resetInput, setKeyState } from './game/input'
 import { TuningPanel } from './game/components/TuningPanel'
 import { LOOT_POSITION, LOOT_RADIUS } from './game/planet'
 import { HangarPanel } from './game/components/HangarPanel'
-import { collectLoot, landOnPlanet, setMode, takeOff, toggleCameraMode } from './game/state'
+import {
+  applyDamage,
+  collectLoot,
+  landOnPlanet,
+  repairAll,
+  resetCombat,
+  setMode,
+  takeOff,
+  toggleCameraMode,
+} from './game/state'
 import { useGameStore } from './game/hooks/useGameStore'
 import { getNearbyPOIs } from './game/procedural'
 import { loadSave, persistSave } from './game/persistence'
@@ -84,6 +93,19 @@ function App() {
       if (event.code === 'KeyH') {
         setMode(snapshot.mode === 'hangar' ? 'space' : 'hangar')
       }
+
+      if (event.code === 'KeyK') {
+        applyDamage('engine', 15)
+        applyDamage('leftWing', 8)
+      }
+
+      if (event.code === 'KeyR') {
+        repairAll()
+      }
+
+      if (event.code === 'KeyM') {
+        resetCombat()
+      }
     }
 
     const onKeyUp = (event: KeyboardEvent) => {
@@ -125,6 +147,7 @@ function App() {
             Nearest POI:{' '}
             {nearestPoi ? `${nearestPoi.kind} (${nearestPoi.distance.toFixed(0)} m)` : 'none'}
           </span>
+          <span>Enemies: {snapshot.enemies.length}</span>
         </div>
         <div className="hud__row hud__row--muted">
           <span>`W/S` pitch</span>
@@ -132,12 +155,16 @@ function App() {
           <span>`Q/E` roll</span>
           <span>`Shift/Ctrl` throttle</span>
           <span>`Space` brake</span>
+          <span>`X` fire</span>
           <span>`C` camera</span>
           <span>`F` fullscreen</span>
           {snapshot.mode === 'space' ? <span>`L` land</span> : <span>`L` take off</span>}
           {snapshot.mode === 'planet' ? <span>`WASD` move</span> : null}
           {canCollectLoot ? <span>`E` collect part</span> : null}
           <span>`H` hangar</span>
+          <span>`K` test damage</span>
+          <span>`R` repair</span>
+          <span>`M` reset combat</span>
           {canLand ? <span>Landing window</span> : null}
           {snapshot.mode === 'planet' && snapshot.lootCollected ? (
             <span>Part acquired</span>

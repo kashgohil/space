@@ -56,6 +56,7 @@ export function Ship() {
       return {
         id: `${partId}-${index}`,
         visual: part.visual,
+        socket: part.socket,
         position: [base[0], base[1] + offset, base[2]] as [number, number, number],
       }
     })
@@ -83,28 +84,34 @@ export function Ship() {
       </mesh>
       {equippedVisuals.map((entry) => {
         if (!entry) return null
+        const socketHealth = snapshot.ship.socketHealth[entry.socket]
+        const damaged = socketHealth < 40
+        const critical = socketHealth < 15
+        const material = damaged ? accentMaterial : partMaterial
+        const emissiveMaterial = critical ? emissivePartMaterial : partMaterial
+
         switch (entry.visual) {
           case 'thruster':
             return (
-              <mesh key={entry.id} position={entry.position} material={emissivePartMaterial}>
+              <mesh key={entry.id} position={entry.position} material={emissiveMaterial}>
                 <cylinderGeometry args={[0.25, 0.4, 0.6, 12]} />
               </mesh>
             )
           case 'gyro':
             return (
-              <mesh key={entry.id} position={entry.position} material={partMaterial}>
+              <mesh key={entry.id} position={entry.position} material={material}>
                 <torusGeometry args={[0.35, 0.08, 12, 24]} />
               </mesh>
             )
           case 'shield':
             return (
-              <mesh key={entry.id} position={entry.position} material={partMaterial}>
+              <mesh key={entry.id} position={entry.position} material={material}>
                 <boxGeometry args={[0.5, 0.2, 0.9]} />
               </mesh>
             )
           case 'nozzle':
             return (
-              <mesh key={entry.id} position={entry.position} material={emissivePartMaterial}>
+              <mesh key={entry.id} position={entry.position} material={emissiveMaterial}>
                 <coneGeometry args={[0.35, 0.7, 14]} />
               </mesh>
             )
