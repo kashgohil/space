@@ -1,4 +1,7 @@
 import { MeshStandardMaterial } from 'three'
+import { useMemo } from 'react'
+import { useGameStore } from '../hooks/useGameStore'
+import { getPartById } from '../parts'
 
 const hullMaterial = new MeshStandardMaterial({
   color: '#c3c7d1',
@@ -20,7 +23,44 @@ const accentMaterial = new MeshStandardMaterial({
   emissiveIntensity: 0.6,
 })
 
+const partMaterial = new MeshStandardMaterial({
+  color: '#a7b3c5',
+  metalness: 0.7,
+  roughness: 0.35,
+})
+
+const emissivePartMaterial = new MeshStandardMaterial({
+  color: '#4f9dff',
+  metalness: 0.3,
+  roughness: 0.4,
+  emissive: '#2f7adf',
+  emissiveIntensity: 0.9,
+})
+
+const socketPositions = {
+  engine: [0, 0, -1.8],
+  core: [0, 0.2, 0.4],
+  leftWing: [-1.6, 0, -0.2],
+  rightWing: [1.6, 0, -0.2],
+} as const
+
 export function Ship() {
+  const snapshot = useGameStore()
+
+  const equippedVisuals = useMemo(() => {
+    return snapshot.equippedParts.map((partId, index) => {
+      const part = getPartById(partId)
+      if (!part) return null
+      const base = socketPositions[part.socket]
+      const offset = (index % 3) * 0.15
+      return {
+        id: `${partId}-${index}`,
+        visual: part.visual,
+        position: [base[0], base[1] + offset, base[2]] as [number, number, number],
+      }
+    })
+  }, [snapshot.equippedParts])
+
   return (
     <group>
       <mesh material={hullMaterial} castShadow receiveShadow>
@@ -41,6 +81,37 @@ export function Ship() {
       <mesh material={accentMaterial} position={[0, 0, -1.4]} castShadow receiveShadow>
         <cylinderGeometry args={[0.2, 0.35, 0.6, 16]} />
       </mesh>
+      {equippedVisuals.map((entry) => {
+        if (!entry) return null
+        switch (entry.visual) {
+          case 'thruster':
+            return (
+              <mesh key={entry.id} position={entry.position} material={emissivePartMaterial}>
+                <cylinderGeometry args={[0.25, 0.4, 0.6, 12]} />
+              </mesh>
+            )
+          case 'gyro':
+            return (
+              <mesh key={entry.id} position={entry.position} material={partMaterial}>
+                <torusGeometry args={[0.35, 0.08, 12, 24]} />
+              </mesh>
+            )
+          case 'shield':
+            return (
+              <mesh key={entry.id} position={entry.position} material={partMaterial}>
+                <boxGeometry args={[0.5, 0.2, 0.9]} />
+              </mesh>
+            )
+          case 'nozzle':
+            return (
+              <mesh key={entry.id} position={entry.position} material={emissivePartMaterial}>
+                <coneGeometry args={[0.35, 0.7, 14]} />
+              </mesh>
+            )
+          default:
+            return null
+        }
+      })}
     </group>
   )
 }
