@@ -35,3 +35,8 @@ Original prompt: setup react + threejs structure
 - Added derived stats helper and stats section in hangar.
 
 - Added socketed visual parts on the ship based on equipped loadout.
+
+- Added per-socket health and visual damage tinting on ship parts.
+- Added debug keys for damage (K) and repair (R).
+
+- Added basic combat loop: enemy drone, projectiles, hit detection, and damage application.
